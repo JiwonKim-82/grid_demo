@@ -1,0 +1,56 @@
+
+<div class="container">
+  <div class="filter-list">
+    <div class="filter-buttons">
+      <mat-icon>tune</mat-icon>
+      <div class="filtered-by">Filtered by</div>
+      <button mat-button (click)="clearAllOptions()" style="font-size: 13px;">Clear Filter</button>
+    </div>
+    <mat-expansion-panel class="mat-elevation-z0" *ngFor="let item of items; let i = index" [expanded]="isExpanded">
+      <button mat-button (click)="clearOption(item)">Clear Option</button>
+      <mat-expansion-panel-header style="font-size: 14px;">{{ item.name }}</mat-expansion-panel-header>
+      <mat-panel-description>
+        <mat-radio-group [(ngModel)]="item.selectedOption">
+          <mat-radio-button 
+          *ngFor="let option of item.options" [value]="option">{{ option }}</mat-radio-button>
+        </mat-radio-group>
+      </mat-panel-description>
+    </mat-expansion-panel>
+    <mat-expansion-panel (opened)="panelOpenState = true" (closed)="panelOpenState = false" class="mat-elevation-z0">
+      <mat-expansion-panel-header>
+        <mat-panel-description>Show Details</mat-panel-description>
+      </mat-expansion-panel-header>
+      <section class="toggle-section">
+        <span>
+          <mat-checkbox class="selectAll" [checked]="isSelectAllChecked" (change)="toggleSelectAll($event)">
+            <b>Select All</b>
+          </mat-checkbox>
+        </span>
+        <span class="toggle-list-section">
+          <ng-container *ngFor="let colDef of optionalCols">
+            <div>
+              <mat-checkbox
+              [(ngModel)]="colDef.checked" (change)="toggleColumnVisibility(colDef)">
+                {{ toTitleCase(colDef.field) }}
+              </mat-checkbox>
+            </div>
+          </ng-container>
+        </span>
+      </section>
+    </mat-expansion-panel>
+  </div>
+
+  <div class="grid-section">
+    <div class="results">{{ selectionNum | async }} Selected | {{ userData.length }} results</div>
+    <ag-grid-angular
+      class="ag-theme-alpine custom-ag-grid"
+      [columnDefs]="colDefs"
+      [rowData]="rowData$ | async"
+      [defaultColDef]="defaultColDef"
+      [rowSelection]="'multiple'"
+      [animateRows]="true"
+      (gridReady)="onGridReady($event)"
+      (selectionChanged)="onSelectionChanged($event)"
+    ></ag-grid-angular>
+  </div>
+</div>
